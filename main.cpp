@@ -2,15 +2,14 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include <array>
 #include <chrono>
-#include <memory>
-#include <algorithm>
 #include <iterator>
 #include <functional>
+#include <algorithm>
 #include <fstream>
+#include <random>
 
-#include "generators.h"
+// #include "generators.h"
 #include "countsort.h"
 
 // Отсюда
@@ -37,20 +36,31 @@ struct measure
 int main(int argc, char const *argv[])
 {
 
-	using namespace std::placeholders;
-	using restype=measure<std::chrono::microseconds>::type;
-
-	// otusalg::print_gen_test(std::cout, 30);
-
 	std::vector<int> v;
 
-	func_vec[j](sizes[i], v);
-
-	vres[i][j][0] = measure<std::chrono::microseconds>::execution([&]()
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::uniform_int_distribution<int> dist(0, 3);
+	for(int i=0; i<20; i++)
 	{
-		otusalg::sort(v.begin(), v.end(), std::less<int>());
-	});
-	if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted [0] std::sort\n";
+		v.push_back(dist(rd));
+	}
+
+	std::copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "));
+	std::cout << std::endl;
+
+	auto res = std::move(otusalg::cntsort(4, v));
+	
+	std::copy(res.begin(), res.end(), std::ostream_iterator<int>(std::cout, " "));
+	std::cout << std::endl;
+
+	// func_vec[j](sizes[i], v);
+
+	// vres[i][j][0] = measure<std::chrono::microseconds>::execution([&]()
+	// {
+	// 	otusalg::sort(v.begin(), v.end(), std::less<int>());
+	// });
+	// if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted [0] std::sort\n";
 
 
 
