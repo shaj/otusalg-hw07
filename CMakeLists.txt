@@ -4,7 +4,7 @@ set(PROJ_NAME l7)
 
 project(${PROJ_NAME})
 
-add_executable(${PROJ_NAME} main.cpp)
+add_executable(${PROJ_NAME} main.cpp generators.cpp)
 
 set_target_properties(${PROJ_NAME} PROPERTIES
   CXX_STANDARD 14

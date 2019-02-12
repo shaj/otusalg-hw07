@@ -9,7 +9,7 @@
 #include <fstream>
 #include <random>
 
-// #include "generators.h"
+#include "generators.h"
 #include "countsort.h"
 
 // Отсюда
@@ -54,14 +54,32 @@ int main(int argc, char const *argv[])
 	std::copy(res.begin(), res.end(), std::ostream_iterator<int>(std::cout, " "));
 	std::cout << std::endl;
 
-	// func_vec[j](sizes[i], v);
 
-	// vres[i][j][0] = measure<std::chrono::microseconds>::execution([&]()
-	// {
-	// 	otusalg::sort(v.begin(), v.end(), std::less<int>());
-	// });
-	// if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted [0] std::sort\n";
+	std::vector<int> gen;
+	otusalg::gen_type2(10000000, gen);
 
+	v.clear();
+	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+	std::cout << "Radix sort \n";
+	std::cout << measure<std::chrono::microseconds>::execution([&]()
+		{
+			otusalg::radixsort(v);
+		}) << " us\n";
+	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
+	else std::cout << "vector NOT sorted\n";
+	std::cout << std::endl;
+
+
+	v.clear();
+	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+	std::cout << "std::sort \n";
+	std::cout << measure<std::chrono::microseconds>::execution([&]()
+		{
+			std::sort(v.begin(), v.end(), std::less<int>());
+		}) << " us\n";
+	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
+	else std::cout << "vector NOT sorted\n";
+	std::cout << std::endl;
 
 
 	return 0;
