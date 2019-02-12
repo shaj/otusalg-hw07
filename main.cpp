@@ -72,6 +72,18 @@ int main(int argc, char const *argv[])
 
 	v.clear();
 	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+	std::cout << "Radix sort 2\n";
+	std::cout << measure<std::chrono::microseconds>::execution([&]()
+		{
+			otusalg::radixsort_2(v);
+		}) << " us\n";
+	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
+	else std::cout << "vector NOT sorted\n";
+	std::cout << std::endl;
+
+
+	v.clear();
+	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
 	std::cout << "std::sort \n";
 	std::cout << measure<std::chrono::microseconds>::execution([&]()
 		{
