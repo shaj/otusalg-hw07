@@ -38,13 +38,7 @@ int main(int argc, char const *argv[])
 
 	std::vector<int> v;
 
-	std::random_device rd;
-	std::mt19937 g(rd());
-	std::uniform_int_distribution<int> dist(0, 3);
-	for(int i=0; i<20; i++)
-	{
-		v.push_back(dist(rd));
-	}
+	otusalg::gen_type8(20, v, 0, 3);
 
 	std::copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "));
 	std::cout << std::endl;
@@ -55,44 +49,69 @@ int main(int argc, char const *argv[])
 	std::cout << std::endl;
 
 
+	// const std::vector<std::pair<int, int>> test {{0, 0x7fffffff}, {100, 110}, {100, 109}, {0, 10}, {0, 9}};
+	const std::vector<std::pair<int, int>> test 
+	{
+		{0, 1}, 
+		{0, 2}, 
+		{0, 3}, 
+		{0, 4}, 
+		{0, 5}, 
+		{0, 6}, 
+		{0, 7}, 
+		{0, 8}, 
+		{0, 9}, 
+		{0, 10}, 
+		{0, 11}, 
+		{0, 12}, 
+		{0, 13}, 
+		{0, 14}, 
+		{0, 15}, 
+		{0, 16}, 
+		{0, 17}, 
+		{0, 18}, 
+		{0, 19}, 
+		{0, 20}, 
+		{0, 21}, 
+	};
 	std::vector<int> gen;
-	otusalg::gen_type2(10000000, gen);
+	for(const auto &dist: test)
+	{
+		std::cout << "\nDistribution [" << dist.first << ", " << dist.second << "]\n";
+		otusalg::gen_type8(1000000, gen, dist.first, dist.second);
 
-	v.clear();
-	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
-	std::cout << "Radix sort \n";
-	std::cout << measure<std::chrono::microseconds>::execution([&]()
-		{
-			otusalg::radixsort(v);
-		}) << " us\n";
-	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
-	else std::cout << "vector NOT sorted\n";
-	std::cout << std::endl;
-
-
-	v.clear();
-	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
-	std::cout << "Radix sort 2\n";
-	std::cout << measure<std::chrono::microseconds>::execution([&]()
-		{
-			otusalg::radixsort_2(v);
-		}) << " us\n";
-	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
-	else std::cout << "vector NOT sorted\n";
-	std::cout << std::endl;
+		v.clear();
+		std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+		std::cout << "Radix sort \n";
+		std::cout << measure<std::chrono::microseconds>::execution([&]()
+			{
+				otusalg::radixsort(v);
+			}) << " us\n";
+		if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted\n";
+		std::cout << std::endl;
 
 
-	v.clear();
-	std::copy(gen.begin(), gen.end(), std::back_inserter(v));
-	std::cout << "std::sort \n";
-	std::cout << measure<std::chrono::microseconds>::execution([&]()
-		{
-			std::sort(v.begin(), v.end(), std::less<int>());
-		}) << " us\n";
-	if(std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector sorted\n";
-	else std::cout << "vector NOT sorted\n";
-	std::cout << std::endl;
+		v.clear();
+		std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+		std::cout << "Radix sort 2\n";
+		std::cout << measure<std::chrono::microseconds>::execution([&]()
+			{
+				otusalg::radixsort_2(v);
+			}) << " us\n";
+		if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted\n";
+		std::cout << std::endl;
 
+
+		v.clear();
+		std::copy(gen.begin(), gen.end(), std::back_inserter(v));
+		std::cout << "std::sort \n";
+		std::cout << measure<std::chrono::microseconds>::execution([&]()
+			{
+				std::sort(v.begin(), v.end(), std::less<int>());
+			}) << " us\n";
+		if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted\n";
+		std::cout << std::endl;
+	}
 
 	return 0;
 }

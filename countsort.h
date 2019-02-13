@@ -115,7 +115,6 @@ void radixsort(std::vector<T> &v)
 
 static constexpr unsigned long long int pow16[] = 
 	{
-		0x0000000000000000UL,
 		0x000000000000000fUL,
 		0x00000000000000f0UL,
 		0x0000000000000f00UL,
@@ -134,6 +133,27 @@ static constexpr unsigned long long int pow16[] =
 		0xf000000000000000UL,
 	};
 
+static constexpr unsigned int pow16s[] = 
+	{
+		0,
+		4,
+		8,
+		12,
+		16,
+		20,
+		24,
+		28,
+		32,
+		34,
+		38,
+		42,
+		46,
+		50,
+		54,
+		58,
+		62
+	};
+
 template<typename T>
 bool cntsort_2(std::vector<T> &v, int digit)
 {
@@ -144,7 +164,7 @@ bool cntsort_2(std::vector<T> &v, int digit)
 
 	for(const auto &it: v)
 	{
-		tmp = (it & pow16[digit+1]) >> pow16[digit];
+		tmp = (it & pow16[digit]) >> pow16s[digit];
 		counters[tmp]++;
 	}
 
@@ -160,7 +180,7 @@ bool cntsort_2(std::vector<T> &v, int digit)
 	std::vector<T> res(v.begin(), v.end());
 	for(int i = v.size()-1; i>=0; --i)
 	{
-		tmp = (res[i] & pow16[digit+1]) >> pow16[digit];
+		tmp = (res[i] & pow16[digit]) >> pow16s[digit];
 		counters[tmp]--;
 		v[counters[tmp]] = res[i];
 	}
@@ -176,7 +196,7 @@ void radixsort_2(std::vector<T> &v)
 	static_assert(std::is_integral<T>::value, "Integral required.");
 
 	int digit = 0;
-	while(cntsort_1(v, digit))
+	while(cntsort_2(v, digit))
 		digit++;
 }
 
