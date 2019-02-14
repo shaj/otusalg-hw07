@@ -49,47 +49,36 @@ int main(int argc, char const *argv[])
 	std::cout << std::endl;
 
 
-	// const std::vector<std::pair<int, int>> test {{0, 0x7fffffff}, {100, 110}, {100, 109}, {0, 10}, {0, 9}};
-	const std::vector<std::pair<int, int>> test 
-	{
-		{0, 1}, 
-		{0, 2}, 
-		{0, 3}, 
-		{0, 4}, 
-		{0, 5}, 
-		{0, 6}, 
-		{0, 7}, 
-		{0, 8}, 
-		{0, 9}, 
-		{0, 10}, 
-		{0, 11}, 
-		{0, 12}, 
-		{0, 13}, 
-		{0, 14}, 
-		{0, 15}, 
-		{0, 16}, 
-		{0, 17}, 
-		{0, 18}, 
-		{0, 19}, 
-		{0, 20}, 
-		{0, 21}, 
-	};
+	const std::vector<std::pair<int, int>> test {{0, 0x7fffffff}, {240, 250}, {250, 260}, {0, 15}, {0, 16}};
+	// const std::vector<std::pair<int, int>> test 
+	// {
+	// 	{0, 1}, 
+	// 	{0, 2}, 
+	// 	{0, 3}, 
+	// 	{0, 4}, 
+	// 	{0, 5}, 
+	// 	{0, 6}, 
+	// 	{0, 7}, 
+	// 	{0, 8}, 
+	// 	{0, 9}, 
+	// 	{0, 10}, 
+	// 	{0, 11}, 
+	// 	{0, 12}, 
+	// 	{0, 13}, 
+	// 	{0, 14}, 
+	// 	{0, 15}, 
+	// 	{0, 16}, 
+	// 	{0, 17}, 
+	// 	{0, 18}, 
+	// 	{0, 19}, 
+	// 	{0, 20}, 
+	// 	{0, 21}, 
+	// };
 	std::vector<int> gen;
 	for(const auto &dist: test)
 	{
 		std::cout << "\nDistribution [" << dist.first << ", " << dist.second << "]\n";
-		otusalg::gen_type8(1000000, gen, dist.first, dist.second);
-
-		v.clear();
-		std::copy(gen.begin(), gen.end(), std::back_inserter(v));
-		std::cout << "Radix sort \n";
-		std::cout << measure<std::chrono::microseconds>::execution([&]()
-			{
-				otusalg::radixsort(v);
-			}) << " us\n";
-		if(!std::is_sorted(v.begin(), v.end(), std::less<int>())) std::cout << "vector NOT sorted\n";
-		std::cout << std::endl;
-
+		otusalg::gen_type8(10000000, gen, dist.first, dist.second);
 
 		v.clear();
 		std::copy(gen.begin(), gen.end(), std::back_inserter(v));
