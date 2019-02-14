@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <stdexcept>
 #include <memory>
 
@@ -57,9 +58,11 @@ class trieItem
 	static_assert(std::is_integral<T>::value, "Integral required.");
 	static_assert(std::is_unsigned<T>::value, "Unsigned required.");
 
-	static constexpr int trie_weight = sizeof(T) / 4;
+	static constexpr int trie_weight = sizeof(T) * 2;   // разряд 4 бита
 
-	std::map<unsigned char, std::unique_ptr<trieItem>> branch;
+	std::map<int, std::unique_ptr<trieItem>> branch;
+
+	int nodeId;
 
 public:
 	trieItem() {}
@@ -67,16 +70,59 @@ public:
 	
 	void add(T it, int depth)
 	{
-		unsigned char tmp = static_cast<unsigned char>((it & pow16[trie_weight - depth]) >> pow16s[trie_weight - depth]);
+std::cout << __PRETTY_FUNCTION__ << std::endl;
+std::cout << "   it: " << it << " depth: " << depth << "\n";
+
+		// Тут проверяем, что лист
+		if(depth == trie_weight)
+		{
+			return;
+		}
+		
+
+		int tmp = static_cast<int>((it & pow16[trie_weight - depth]) >> pow16s[trie_weight - depth]);
 		T val = it ^ (it & pow16[trie_weight - depth]);
+std::cout << "   tmp: " << tmp << " val: " << val << "\n";
 		auto res = branch.find(tmp);
 		if(res == branch.end())
 		{
-			branch.add(tmp);
-			branch[tmp] = std::make_unique<trieItem>();
+			// branch.add(tmp);
+			branch[tmp] = std::make_unique<trieItem<T>>();
 		}
 
-		branch[tmp].add(val, depth + 1);
+		branch.at(tmp)->add(val, depth + 1);
+	}
+
+
+	void get_sorted(std::vector<T> &v, T buf, int depth)
+	{
+		T tmp;
+std::cout << __PRETTY_FUNCTION__ << std::endl;
+		// Определяем лист или не лист
+		if(depth == trie_weight)
+		{
+			v.push_back(buf);
+		}
+		else
+		{
+			// Просматриваем дальше
+			for(const auto &it: branch)
+			{
+				tmp = (it.first << pow16s[depth]) & buf;
+				it.second->get_sorted(v, tmp, depth + 1);
+			}
+		}
+	}
+
+
+	void print(std::ostream &os)
+	{
+		os << "Trie node: ";
+		for(const auto &it: branch) 
+			os << static_cast<unsigned int>(it.first) << " ";
+		os << "\n";
+		for(const auto &it: branch)
+			it.second->print(os);
 	}
 
 };
@@ -105,6 +151,23 @@ public:
 		rootItem.add(it, 0);
 	}
 
+	void remove(T it)
+	{
+	}
+
+	std::vector<T> get_sorted()
+	{
+std::cout << __PRETTY_FUNCTION__ << std::endl;
+		std::vector<T> v;
+		rootItem.get_sorted(v, 0, 0);
+		return v;
+	}
+
+	void print_trie(std::ostream &os)
+	{
+		os << "Trie root\n";
+		rootItem.print(os);
+	}
 
 };
 
