@@ -36,11 +36,12 @@ struct measure
 int main(int argc, char const *argv[])
 {
 
-	std::vector<unsigned short> v;
+	std::vector<unsigned short> v { 0x1234, 0x2345, 0x3456, 0x1234, 0x2345, 0x3456 };
 
 	// otusalg::gen_type8(20U, v, 0U, 3U);
-	otusalg::gen_type2(5U, v);
+	// otusalg::gen_type2(5U, v);
 
+std::cout << std::setbase(16) << std::showbase;
 	std::copy(v.begin(), v.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
 	std::cout << std::endl;
 

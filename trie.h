@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include <cstdio>
+
 namespace otusalg
 {
 
@@ -64,8 +66,10 @@ class trieItem
 
 	int nodeId;
 
+	int leaf_cnt;
+
 public:
-	trieItem() {}
+	trieItem() : nodeId(0), leaf_cnt(0) {}
 	~trieItem() {}
 	
 	void add(T it, int depth)
@@ -73,44 +77,49 @@ public:
 std::cout << __PRETTY_FUNCTION__ << std::endl;
 std::cout << "   it: " << it << " depth: " << depth << "\n";
 
-		// Тут проверяем, что лист
-		if(depth == trie_weight)
-		{
-			return;
-		}
-		
-
-		int tmp = static_cast<int>((it & pow16[trie_weight - depth]) >> pow16s[trie_weight - depth]);
+		int tmp = static_cast<int>((it & pow16[trie_weight - depth - 1]) >> pow16s[trie_weight - depth - 1]);
 		T val = it ^ (it & pow16[trie_weight - depth]);
-std::cout << "   tmp: " << tmp << " val: " << val << "\n";
-		auto res = branch.find(tmp);
-		if(res == branch.end())
-		{
-			// branch.add(tmp);
-			branch[tmp] = std::make_unique<trieItem<T>>();
-		}
 
-		branch.at(tmp)->add(val, depth + 1);
+std::cout << "   tmp: " << tmp << " val: " << val << "\n";
+
+
+		// Тут проверяем, что лист (последний регистр)
+		if(depth == trie_weight - 1)
+		{
+			// branch.at(tmp)->add_leaf();
+			add_leaf();
+std::cout << "   LEAF\n";
+		}
+		else
+		{
+			auto res = branch.find(tmp);
+			if(res == branch.end())
+			{
+				branch[tmp] = std::make_unique<trieItem<T>>();
+			}
+			branch.at(tmp)->add(val, depth + 1);
+		}		
 	}
 
+	void add_leaf()
+	{
+		leaf_cnt++;
+	}
 
 	void get_sorted(std::vector<T> &v, T buf, int depth)
 	{
 		T tmp;
 std::cout << __PRETTY_FUNCTION__ << std::endl;
-		// Определяем лист или не лист
-		if(depth == trie_weight)
+
+		for(int i=0; i<leaf_cnt; i++)
+			v.push_back(tmp);
+
+		for(const auto &it: branch)
 		{
-			v.push_back(buf);
-		}
-		else
-		{
-			// Просматриваем дальше
-			for(const auto &it: branch)
-			{
-				tmp = (it.first << pow16s[depth]) & buf;
-				it.second->get_sorted(v, tmp, depth + 1);
-			}
+			tmp = (it.first << pow16s[trie_weight - depth - 1]) | buf;
+std::cout << "   it.first: " << it.first << " depth: " << depth << "\n";
+std::cout << "   tmp: " << tmp << " buf: " << buf << "\n";
+			it.second->get_sorted(v, tmp, depth + 1);
 		}
 	}
 
@@ -148,6 +157,7 @@ public:
 	
 	void add(T it)
 	{
+std::cout << std::setbase(16) << std::showbase;
 		rootItem.add(it, 0);
 	}
 
@@ -158,6 +168,7 @@ public:
 	std::vector<T> get_sorted()
 	{
 std::cout << __PRETTY_FUNCTION__ << std::endl;
+std::cout << std::setbase(16) << std::showbase;
 		std::vector<T> v;
 		rootItem.get_sorted(v, 0, 0);
 		return v;
@@ -166,6 +177,7 @@ std::cout << __PRETTY_FUNCTION__ << std::endl;
 	void print_trie(std::ostream &os)
 	{
 		os << "Trie root\n";
+std::cout << std::setbase(16) << std::showbase;
 		rootItem.print(os);
 	}
 
