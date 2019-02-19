@@ -8,6 +8,9 @@
 
 #include <cstdio>
 
+
+// #define TRDEBUG
+
 namespace otusalg
 {
 
@@ -72,23 +75,38 @@ public:
 	trieItem() : nodeId(0), leaf_cnt(0) {}
 	~trieItem() {}
 	
+
+	void add_leaf()
+	{
+		leaf_cnt++;
+#ifdef TRDEBUG
+std::cout << "   LEAF\n";
+#endif // TRDEBUG
+	}
+
+	void remove_leaf()
+	{
+		if(leaf_cnt) leaf_cnt--;
+	}
+
 	void add(T it, int depth)
 	{
+#ifdef TRDEBUG
 std::cout << __PRETTY_FUNCTION__ << std::endl;
 std::cout << "   it: " << it << " depth: " << depth << "\n";
+#endif // TRDEBUG
 
 		int tmp = static_cast<int>((it & pow16[trie_weight - depth - 1]) >> pow16s[trie_weight - depth - 1]);
 		T val = it ^ (it & pow16[trie_weight - depth]);
 
+#ifdef TRDEBUG
 std::cout << "   tmp: " << tmp << " val: " << val << "\n";
-
+#endif // TRDEBUG
 
 		// Тут проверяем, что лист (последний регистр)
-		if(depth == trie_weight - 1)
+		if(depth == trie_weight)
 		{
-			// branch.at(tmp)->add_leaf();
 			add_leaf();
-std::cout << "   LEAF\n";
 		}
 		else
 		{
@@ -101,24 +119,82 @@ std::cout << "   LEAF\n";
 		}		
 	}
 
-	void add_leaf()
+
+	/**
+	 * 
+	 * \param it    - искомая последовательность
+	 * \param depth - глубина узла
+	 * \param acc   - собранное значение
+	 * 
+	 * \return - true - если нужно удалить узел (других ссылок на этот узел нет).
+	 */
+	bool remove(T it, int depth, T acc)
 	{
-		leaf_cnt++;
+#ifdef TRDEBUG
+std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif // TRDEBUG
+
+		if(depth == trie_weight)
+		{ // Собрана полная последовательность
+			if((it == acc) && (leaf_cnt != 0))
+			{ // в trie находится такой узел
+				remove_leaf();
+				if((leaf_cnt == 0) && (branch.size() == 0))
+					return true;
+				return false;
+			}
+			else
+			{
+				// Что тут делать не понятно
+				throw std::range_error("item not found");
+			}
+		}
+
+		
+		// Следующий регистр, который требуется найти
+		int tmp = static_cast<int>((it & pow16[trie_weight - depth - 1]) >> pow16s[trie_weight - depth - 1]);
+		bool retval = false;
+
+		auto res = branch.find(tmp);
+		if(res == branch.end())
+		{
+			throw std::range_error("item not found");
+		}
+		else
+		{
+			T val = (tmp << pow16s[trie_weight - depth - 1]) | acc;
+#ifdef TRDEBUG
+std::cout << "   res->first: " << res->first << " depth: " << depth << "\n";
+std::cout << "   tmp: " << tmp << " val: " << val << " acc: " << acc << "\n";
+#endif // TRDEBUG
+			retval = res->second->remove(it, depth + 1, val);
+			if(retval)
+				branch.erase(res);
+			if(retval && branch.size() != 0)
+				retval = false;
+		}
+
+		return retval;
 	}
+
 
 	void get_sorted(std::vector<T> &v, T buf, int depth)
 	{
 		T tmp;
+#ifdef TRDEBUG
 std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif // TRDEBUG
 
 		for(int i=0; i<leaf_cnt; i++)
-			v.push_back(tmp);
+			v.push_back(buf);
 
 		for(const auto &it: branch)
 		{
 			tmp = (it.first << pow16s[trie_weight - depth - 1]) | buf;
+#ifdef TRDEBUG
 std::cout << "   it.first: " << it.first << " depth: " << depth << "\n";
 std::cout << "   tmp: " << tmp << " buf: " << buf << "\n";
+#endif // TRDEBUG
 			it.second->get_sorted(v, tmp, depth + 1);
 		}
 	}
@@ -152,32 +228,42 @@ public:
 		for(auto it: v) add(it);
 	}
 
-
 	~trie() {}
 	
+
 	void add(T it)
 	{
+#ifdef TRDEBUG
 std::cout << std::setbase(16) << std::showbase;
+#endif // TRDEBUG
 		rootItem.add(it, 0);
 	}
 
+
 	void remove(T it)
 	{
+		rootItem.remove(it, 0, 0);
 	}
+
 
 	std::vector<T> get_sorted()
 	{
+#ifdef TRDEBUG
 std::cout << __PRETTY_FUNCTION__ << std::endl;
 std::cout << std::setbase(16) << std::showbase;
+#endif // TRDEBUG
 		std::vector<T> v;
 		rootItem.get_sorted(v, 0, 0);
 		return v;
 	}
 
+
 	void print_trie(std::ostream &os)
 	{
 		os << "Trie root\n";
+#ifdef TRDEBUG
 std::cout << std::setbase(16) << std::showbase;
+#endif // TRDEBUG
 		rootItem.print(os);
 	}
 

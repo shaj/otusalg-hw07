@@ -36,56 +36,84 @@ struct measure
 int main(int argc, char const *argv[])
 {
 
-	std::vector<unsigned short> v { 0x1234, 0x2345, 0x3456, 0x1234, 0x2345, 0x3456 };
+	{
 
-	// otusalg::gen_type8(20U, v, 0U, 3U);
-	// otusalg::gen_type2(5U, v);
+		std::vector<unsigned short> v { 0x1234, 0x2345, 0x3456, 0x1234, 0x2345, 0x3456 };
 
-std::cout << std::setbase(16) << std::showbase;
-	std::copy(v.begin(), v.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
-	std::cout << std::endl;
+		std::cout << std::setbase(16) << std::showbase;
+		std::copy(v.begin(), v.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
+		std::cout << std::endl;
 
-	otusalg::trie<unsigned short> tr(v);
-	auto res = tr.get_sorted();
-	
-	std::copy(res.begin(), res.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
-	std::cout << std::endl;
+		otusalg::trie<unsigned short> tr(v);
+		auto res = tr.get_sorted();
+		
+		std::copy(res.begin(), res.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
+		std::cout << std::endl;
 
-	tr.print_trie(std::cout);
+		tr.remove(0x2345);
+		res = tr.get_sorted();
+		std::copy(res.begin(), res.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
+		std::cout << std::endl;
+
+		tr.remove(0x2345);
+		res = tr.get_sorted();
+		std::copy(res.begin(), res.end(), std::ostream_iterator<unsigned short>(std::cout, " "));
+		std::cout << std::endl;
+
+		tr.print_trie(std::cout);
+	}
 
 
-	// const std::vector<std::pair<int, int>> test {{0, 0x7fffffff}, {100, 110}, {100, 109}, {0, 10}, {0, 9}};
-	// const std::vector<std::pair<int, int>> test 
-	// {
-	// 	{0, 1}, 
-	// 	{0, 2}, 
-	// 	{0, 3}, 
-	// 	{0, 4}, 
-	// 	{0, 5}, 
-	// 	{0, 6}, 
-	// 	{0, 7}, 
-	// 	{0, 8}, 
-	// 	{0, 9}, 
-	// 	{0, 10}, 
-	// 	{0, 11}, 
-	// 	{0, 12}, 
-	// 	{0, 13}, 
-	// 	{0, 14}, 
-	// 	{0, 15}, 
-	// 	{0, 16}, 
-	// 	{0, 17}, 
-	// 	{0, 18}, 
-	// 	{0, 19}, 
-	// 	{0, 20}, 
-	// 	{0, 21}, 
-	// };
-	// std::vector<int> gen;
-	// for(const auto &dist: test)
-	// {
-	// 	std::cout << "\nDistribution [" << dist.first << ", " << dist.second << "]\n";
-	// 	otusalg::gen_type8(1000000, gen, dist.first, dist.second);
+	{
+		std::cout << "\n10 000 random values\n";
+		std::vector<unsigned int> gen;
+		std::vector<unsigned int> v1;
 
-	// }
+		otusalg::gen_type2(10000U, gen);
+
+		std::copy(gen.begin(), gen.end(), std::back_inserter(v1));
+		std::sort(v1.begin(), v1.end());
+
+		otusalg::trie<unsigned int> tr(gen);
+		auto v2 = tr.get_sorted();
+
+		if(std::is_sorted(v2.begin(), v2.end()))
+		{
+			std::cout << "v2 is sorted\n";
+			if(v2 == v1)
+				std::cout << "v2 == v1\n";
+			else
+				std::cout << "v2 != v1\n";
+		}
+		else
+			std::cout << "v2 is NOT sorted\n";
+	}
+
+
+	{
+		std::cout << "\nMany duplicates\n";
+		std::vector<unsigned int> gen;
+		std::vector<unsigned int> v1;
+
+		otusalg::gen_type8(10000U, gen, 100U, 150U);
+
+		std::copy(gen.begin(), gen.end(), std::back_inserter(v1));
+		std::sort(v1.begin(), v1.end());
+
+		otusalg::trie<unsigned int> tr(gen);
+		auto v2 = tr.get_sorted();
+
+		if(std::is_sorted(v2.begin(), v2.end()))
+		{
+			std::cout << "v2 is sorted\n";
+			if(v2 == v1)
+				std::cout << "v2 == v1\n";
+			else
+				std::cout << "v2 != v1\n";
+		}
+		else
+			std::cout << "v2 is NOT sorted\n";
+	}
 
 	return 0;
 }
